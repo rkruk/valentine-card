@@ -26,7 +26,7 @@
     <link rel="canonical" href="index.html">
 
   <!-- Device's view methods -->
-    <meta name="viewport" content="width=device-width, user-scalable = yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="theme-color" content="#FFFFFF">
@@ -84,6 +84,8 @@
     </script>
 </head>
 <body>
+<!-- Main content -->	
+<div="main">	
 <canvas></canvas>
 <!-- main .js script for Jola's heart -->
 <script>
@@ -117,5 +119,6 @@ setInterval(function(){a.fillStyle="rgba(0,0,0,.2)"; <!-- background color -->
 		_(u);u.X*=u.F;u.Y*=u.F;
 		for(k=0;k<v-1;)T=f[k],N=f[++k],N.x-=0.7*(N.x-T.x),N.y-=0.7*(N.y-T.y),_(N)}},25);
 </script>
+</div>
 </body>
 </html>
