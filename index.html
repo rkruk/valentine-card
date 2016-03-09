@@ -82,33 +82,10 @@
             height: 100%;
             }
     </style>
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-   <script>
-      function reSize(id) {
-         // @obj - get the element with the given ID
-         // @w - the current width of the viewer window
-         // @h - the current height of the viewer window
-         var obj=$('#'+id),w=$(window).width(),h=$(window).height();
-         obj.css({
-            width:w,
-            height:h
-         });
-      }
-      $(function(){
-         // @obj_id - set the ID of the element you want to resize
-         var obj_id='resize_wrapper';
-         // Call the function on page load
-         reSize(obj_id);
-         // Then create an event handler that calls the function whenever the user resizes the browser
-         $(window).resize(function(){
-            reSize(obj_id);
-         });
-      });
-   </script>
 </head>
 <body>
 <!-- Main content -->	
-<div id="resize_wrapper">	
+<div id="main">	
 <canvas></canvas>
 <!-- main .js script for Jola's heart -->
 <script>
