@@ -28,7 +28,6 @@
     <meta name="apple-mobile-web-app-capable" content="no">
   <!-- Facepalm & Open Graph, other stuff: -->
     <link rel="canonical" href="https://example.com/">
-    <link rel="publisher" href="https://plus.google.com/u/0/b/YourGooglePlusProfile">
     <meta property="og:locale" content="en_GB">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="EXAMPLE.COM">
@@ -75,7 +74,7 @@
     </script>
     <style>
       body {
-      	    /** That part needs some attention later - it doesn't won't work as it needs to */
+      	    /* That part needs some attention later - it does not want to work as I want it to. */
       	    margin:0;
             padding:0;
             width: 100%;
@@ -84,12 +83,12 @@
     </style>
 </head>
 <body>
-<!-- Main content -->	
+<!-- Main canvas content -->	
 <div id="main">	
 <canvas></canvas>
 <!-- main .js heart script unminified for your viewing/editing pleasure -->
 <script>
-var c = document.getElementsByTagName('canvas')[0];
+var c = document.getElementsByTagName('canvas')[0]; //canvas element
 var b = document.body;
 var a = c.getContext('2d');
 e=[];
