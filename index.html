@@ -54,15 +54,25 @@
       var a = c.getContext('2d');
       var e = [];
       var h = [];
-      var O = c.width = window.innerWidth;
-      var Q = c.height = window.innerHeight;
       var v = 32;
       var M = Math;
       var R = M.random;
       var C = M.cos;
       var Y = 6.3;
-      for (i = 0; i < Y; i += 0.2)
-        h.push([O / 2 + 180 * M.pow(M.sin(i), 3), Q / 2 + 10 * -(15 * C(i) - 5 * C(2 * i) - 2 * C(3 * i) - C(4 * i))]);
+
+      function resizeCanvas() {
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+        O = c.width;
+        Q = c.height;
+        h = [];
+        for (i = 0; i < Y; i += 0.2)
+          h.push([O / 2 + 180 * M.pow(M.sin(i), 3), Q / 2 + 10 * -(15 * C(i) - 5 * C(2 * i) - 2 * C(3 * i) - C(4 * i))]);
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
       for (i = 0; i < v;) {
         x = R() * O;
         y = R() * Q;
@@ -83,8 +93,9 @@
             F: 0.2 * R() + 0.7,
             f: "hsla(" + ~~H + "," + ~~S + "%," + ~~B + "%,.1)"
           };
-        e[i++] = f
+        e[i++] = f;
       }
+
       function _(d) {
         a.fillStyle = d.f;
         a.beginPath();
@@ -92,6 +103,7 @@
         a.closePath();
         a.fill();
       }
+
       setInterval(function () {
         a.fillStyle = "rgba(0,0,0,.2)"; // background color
         a.fillRect(0, 0, O, Q);
