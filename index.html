@@ -1,33 +1,11 @@
-<!DOCTYPE HTML>
-<html lang="en" prefix="og: http://ogp.me/ns#">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <!-- Metadata -->
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <!-- Language -->
-  <meta name="language" content="en">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Valentine Card</title>
   <meta name="description" content="Valentine">
-  <meta name="robots" content="noindex, nofollow, noodp, noydir">
-  <meta name="author" content="John Doe">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Open Graph -->
-  <meta property="og:locale" content="en_GB">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Valentine Card">
-  <meta property="og:description" content="Valentine Card">
-  <meta property="og:image" content="Facebook Picture http address here">
-  <meta property="og:url" content="https://example.com/">
-  <meta property="og:site_name" content="example.com">
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:site" content="@twitter_handle">
-  <meta name="twitter:title" content="John Doe | Valentine Card">
-  <meta name="twitter:description" content="Valentine Card">
-  <meta name="twitter:url" content="https://twitter.com/Twitter_Profile">
-  <meta name="twitter:creator" content="@twitter_handle">
-  <!-- Favicons -->
-  <link rel="icon" href="favicon.ico">
+  <meta name="author" content="Rafał Kruk">
   <!-- Styles -->
   <style>
     body {
@@ -38,11 +16,15 @@
       align-items: center;
       width: 100vw;
       height: 100vh;
+      height: 100dvh; /* Use dynamic viewport height for mobile */
       background-color: #000;
       overflow: hidden;
     }
     canvas {
       display: block;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh; /* Use dynamic viewport height for mobile */
     }
   </style>
 </head>
@@ -50,83 +32,206 @@
   <div id="main">
     <canvas></canvas>
     <script>
-      var c = document.getElementsByTagName('canvas')[0]; //canvas element
-      var a = c.getContext('2d');
-      var e = [];
-      var h = [];
-      var v = 32;
-      var M = Math;
-      var R = M.random;
-      var C = M.cos;
-      var Y = 6.3;
-
-      function resizeCanvas() {
-        c.width = window.innerWidth;
-        c.height = window.innerHeight;
-        O = c.width;
-        Q = c.height;
-        h = [];
-        for (i = 0; i < Y; i += 0.2)
-          h.push([O / 2 + 180 * M.pow(M.sin(i), 3), Q / 2 + 10 * -(15 * C(i) - 5 * C(2 * i) - 2 * C(3 * i) - C(4 * i))]);
-      }
-
-      window.addEventListener('resize', resizeCanvas);
-      resizeCanvas();
-
-      for (i = 0; i < v;) {
-        x = R() * O;
-        y = R() * Q;
-        H = 80 * (i / v) + 280;
-        S = 40 * R() + 60;
-        B = 60 * R() + 20;
-        f = [];
-        for (k = 0; k < v;)
-          f[k++] = {
-            x: x,
-            y: y,
-            X: 0,
-            Y: 0,
-            R: 1 - k / v + 1,
-            S: R() + 1,
-            q: ~~(R() * v),
-            D: 2 * (i % 2) - 1,
-            F: 0.2 * R() + 0.7,
-            f: "hsla(" + ~~H + "," + ~~S + "%," + ~~B + "%,.1)"
-          };
-        e[i++] = f;
-      }
-
-      function _(d) {
-        a.fillStyle = d.f;
-        a.beginPath();
-        a.arc(d.x, d.y, d.R, 0, Y, 1);
-        a.closePath();
-        a.fill();
-      }
-
-      setInterval(function () {
-        a.fillStyle = "rgba(0,0,0,.2)"; // background color
-        a.fillRect(0, 0, O, Q);
-        for (i = v; i--;) {
-          f = e[i];
-          u = f[0];
-          q = h[u.q];
-          D = u.x - q[0];
-          E = u.y - q[1];
-          G = M.sqrt(D * D + E * E);
-          10 > G && (0.95 < R() ? u.q = ~~(R() * v) : (0.99 < R() && (u.D *= -1), u.q += u.D, u.q %= v, 0 > u.q && (u.q += v)));
-          u.X += -D / G * u.S;
-          u.Y += -E / G * u.S;
-          u.x += u.X;
-          u.y += u.Y;
-          _(u);
-          u.X *= u.F;
-          u.Y *= u.F;
-          for (k = 0; k < v - 1;)
-            T = f[k], N = f[++k], N.x -= 0.7 * (N.x - T.x), N.y -= 0.7 * (N.y - T.y), _(N);
+      // Performance optimized Valentine card - same visuals, better code
+      (function() {
+        'use strict';
+        
+        const canvas = document.getElementsByTagName('canvas')[0];
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const heartPoints = [];
+        const TWO_PI = Math.PI * 2;
+        
+        let canvasWidth, canvasHeight;
+        let animationId;
+        let particleCount, trailLength;
+        
+        // Cached math functions for better performance
+        const { random: rand, cos, sin, sqrt, pow, floor } = Math;
+        
+        function resizeCanvas() {
+          const dpr = window.devicePixelRatio || 1;
+          
+          // For mobile, use actual viewport dimensions
+          const actualWidth = window.innerWidth;
+          const actualHeight = window.innerHeight;
+          
+          // Set canvas size to actual viewport
+          canvas.width = actualWidth * dpr;
+          canvas.height = actualHeight * dpr;
+          
+          // Scale canvas context for high-DPI
+          ctx.scale(dpr, dpr);
+          
+          // Set CSS size to actual viewport
+          canvas.style.width = actualWidth + 'px';
+          canvas.style.height = actualHeight + 'px';
+          
+          // Use actual dimensions for calculations
+          canvasWidth = actualWidth;
+          canvasHeight = actualHeight;
+          
+          // Update particle counts based on current screen size
+          const isMobile = actualWidth < 768;
+          particleCount = isMobile ? 16 : 32;
+          trailLength = isMobile ? 16 : 32;
+          
+          // Calculate responsive heart size - much smaller for mobile
+          const heartScale = Math.min(canvasWidth, canvasHeight) * (isMobile ? 0.25 : 0.4);
+          
+          // Regenerate heart points with proper centering
+          heartPoints.length = 0;
+          for (let i = 0; i < 6.3; i += 0.2) {
+            heartPoints.push([
+              canvasWidth / 2 + heartScale * pow(sin(i), 3),
+              canvasHeight / 2 - heartScale * 0.8 * (15 * cos(i) - 5 * cos(2 * i) - 2 * cos(3 * i) - cos(4 * i)) / 16
+            ]);
+          }
         }
-      }, 25);
+        
+        function initParticles() {
+          particles.length = 0;
+          
+          for (let i = 0; i < particleCount; i++) {
+            const x = rand() * canvasWidth;
+            const y = rand() * canvasHeight;
+            const hue = 80 * (i / particleCount) + 280;
+            const saturation = 40 * rand() + 60;
+            const brightness = 60 * rand() + 20;
+            
+            const trail = [];
+            for (let k = 0; k < trailLength; k++) {
+              trail[k] = {
+                x: x,
+                y: y,
+                vx: 0,
+                vy: 0,
+                size: 1 - k / trailLength + 1,
+                speed: rand() + 1,
+                targetIndex: floor(rand() * heartPoints.length),
+                direction: 2 * (i % 2) - 1,
+                friction: 0.2 * rand() + 0.7,
+                color: `hsla(${floor(hue)},${floor(saturation)}%,${floor(brightness)}%,.1)`
+              };
+            }
+            particles[i] = trail;
+          }
+        }
+        
+        function drawParticle(particle) {
+          ctx.fillStyle = particle.color;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.size, 0, TWO_PI, true);
+          ctx.closePath();
+          ctx.fill();
+        }
+        
+        function updateAndDraw() {
+          // Clear canvas with fade effect
+          ctx.fillStyle = "rgba(0,0,0,.2)";
+          ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+          
+          // Update particles
+          for (let i = particleCount - 1; i >= 0; i--) {
+            const trail = particles[i];
+            const head = trail[0];
+            const target = heartPoints[head.targetIndex];
+            
+            if (target) {
+              const dx = head.x - target[0];
+              const dy = head.y - target[1];
+              const distance = sqrt(dx * dx + dy * dy);
+              
+              // Target switching logic
+              if (distance < 10) {
+                if (rand() > 0.95) {
+                  head.targetIndex = floor(rand() * heartPoints.length);
+                } else {
+                  if (rand() > 0.99) head.direction *= -1;
+                  head.targetIndex += head.direction;
+                  head.targetIndex %= heartPoints.length;
+                  if (head.targetIndex < 0) head.targetIndex += heartPoints.length;
+                }
+              }
+              
+              // Apply forces
+              head.vx += -dx / distance * head.speed;
+              head.vy += -dy / distance * head.speed;
+            }
+            
+            // Update head position
+            head.x += head.vx;
+            head.y += head.vy;
+            drawParticle(head);
+            
+            // Apply friction
+            head.vx *= head.friction;
+            head.vy *= head.friction;
+            
+            // Update trail
+            for (let k = 0; k < trailLength - 1; k++) {
+              const current = trail[k];
+              const next = trail[k + 1];
+              next.x -= 0.7 * (next.x - current.x);
+              next.y -= 0.7 * (next.y - current.y);
+              drawParticle(next);
+            }
+          }
+        }
+        
+        function animate() {
+          updateAndDraw();
+          setTimeout(() => {
+            if (animationId) {
+              animationId = requestAnimationFrame(animate);
+            }
+          }, 25);
+        }
+        
+        function handleResize() {
+          resizeCanvas();
+          initParticles();
+        }
+        
+        // Debounced resize handler for better performance
+        let resizeTimeout;
+        function debouncedResize() {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(handleResize, 100);
+        }
+        
+        function handleVisibilityChange() {
+          if (document.hidden) {
+            if (animationId) {
+              cancelAnimationFrame(animationId);
+              animationId = null;
+            }
+          } else {
+            if (!animationId) {
+              animationId = requestAnimationFrame(animate);
+            }
+          }
+        }
+        
+        // Initialize
+        resizeCanvas();
+        initParticles();
+        animationId = requestAnimationFrame(animate);
+        
+        // Event listeners
+        window.addEventListener('resize', debouncedResize);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        // Cleanup function (in case needed)
+        window.valentineCleanup = function() {
+          if (animationId) cancelAnimationFrame(animationId);
+          if (resizeTimeout) clearTimeout(resizeTimeout);
+          window.removeEventListener('resize', debouncedResize);
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+      })();
     </script>
   </div>
 </body>
 </html>
+
